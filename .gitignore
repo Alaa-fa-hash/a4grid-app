@@ -77,3 +77,8 @@ yarn-error.log
 # Local build downloads
 /downloads/
 /local-maven/
+
+# Local build downloads
+/downloads/
+/local-maven/
+/android/local-maven/

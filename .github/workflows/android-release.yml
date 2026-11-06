@@ -33,6 +33,8 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
+          SDKMANAGER_DIR="$(dirname "$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)")"
+          echo "$SDKMANAGER_DIR" >> "$GITHUB_PATH"
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006"
 
@@ -41,6 +43,19 @@ jobs:
 
       - name: Patch legacy SQLite repository
         run: sed -i 's/jcenter()/mavenCentral()/g' node_modules/react-native-sqlite-storage/platforms/android/build.gradle
+
+      - name: Download vendored React Native dependency
+        run: |
+          mkdir -p android/local-maven/com/facebook/react/react-android/0.88.1
+          curl -L --fail --retry 10 --retry-all-errors -o android/local-maven/com/facebook/react/react-android/0.88.1/react-android-0.88.1-release.aar \
+            https://github.com/Alaa-fa-hash/a4grid-app/releases/download/deps-0.88.1/react-android-0.88.1-release.aar
+          curl -L --fail --retry 10 --retry-all-errors -o android/local-maven/com/facebook/react/react-android/0.88.1/react-android-0.88.1.pom \
+            https://github.com/Alaa-fa-hash/a4grid-app/releases/download/deps-0.88.1/react-android-0.88.1.pom
+
+      - name: Verify vendored React Native artifacts
+        run: |
+          test -f android/local-maven/com/facebook/react/react-android/0.88.1/react-android-0.88.1-release.aar || { echo "react-android AAR missing"; exit 1; }
+          ls -lh android/local-maven/com/facebook/react/react-android/0.88.1/
 
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon

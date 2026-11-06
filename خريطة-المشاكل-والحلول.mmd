@@ -1,0 +1,38 @@
+flowchart TD
+    A[تطبيق A4Grid<br/>React Native CLI Bare] --> B[الكود والواجهة]
+    A --> C[التخزين المحلي SQLite]
+    A --> D[طبقة Android وGradle]
+    D --> E[GitHub Actions]
+    E --> F[APK Release]
+
+    D --> D1{Android SDK غير موجود}
+    D1 -->|محاولة مباشرة| D2[Gradle يفشل]
+    D1 -->|الحل المجرب| D3[تثبيت SDK + API 36]
+    D3 --> D4{JDK بلا javac}
+    D4 -->|محاولة البناء| D5[Toolchain JAVA_COMPILER يفشل]
+    D4 -->|الحل| D6[تثبيت OpenJDK 21 الكامل]
+    D6 --> D7{SQLite يستخدم jcenter}
+    D7 -->|محاولة أولى| D8[Could not find method jcenter]
+    D7 -->|الحل| D9[استبدال jcenter بـ mavenCentral]
+    D9 --> D10{تنزيل Hermes ينقطع}
+    D10 -->|محاولة| D11[تعطيل Hermes]
+    D11 --> D12{تنزيل react-android ينقطع}
+    D12 -->|محاولة| D13[إعادة المحاولة + تنزيل Range]
+    D13 --> D14[تجميع الأجزاء فشل بسبب اسم part]
+
+    E --> E1{مستودع خاص}
+    E1 -->|محاولة| E2[Workflow يفشل مبكرًا]
+    E1 -->|الحل بعد موافقة المستخدم| E3[تحويل المستودع إلى Public]
+    E3 --> E4{setup-android يحاول حزمة tools}
+    E4 -->|فشل| E5[إزالة Action القديمة]
+    E5 --> E6{sdkmanager غير موجود في PATH}
+    E6 -->|فشل v1.0.1| E7[إضافة مسار sdkmanager تلقائيًا]
+    E7 --> E8[v1.0.2 قيد الاختبار]
+    E8 --> F
+
+    classDef done fill:#DCEEEB,stroke:#126B72,color:#182329;
+    classDef fail fill:#FFE3DE,stroke:#B65B53,color:#182329;
+    classDef current fill:#FFF0C9,stroke:#D7A33D,color:#182329;
+    class B,C,D3,D6,D9,D11,E3,E5,E7 done;
+    class D2,D5,D8,D14,E2,E4,E6 fail;
+    class E8,F current;

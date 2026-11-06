@@ -18,4 +18,19 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        exclusiveContent {
+            forRepository {
+                maven { url = uri("${rootDir}/local-maven") }
+            }
+            filter {
+                includeGroup "com.facebook.react"
+            }
+        }
+        google()
+        mavenCentral()
+    }
+}
+
 apply plugin: "com.facebook.react.rootproject"
